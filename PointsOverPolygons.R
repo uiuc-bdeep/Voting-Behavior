@@ -10,7 +10,7 @@
 
 ## state GA is not avaliable
 
-points_over_polygon <-function(points_path, polygons_path, polygons_layer_name, default_projection, outputFilePath){
+points_over_polygon <-function(points_path, polygons_path, outputFilePath){
   
   ##################################################################
   ## Preliminaries
@@ -31,7 +31,8 @@ points_over_polygon <-function(points_path, polygons_path, polygons_layer_name, 
   ## assigning the variables ##
   pointFilePath <- points_path
   polygonFilePath <- polygons_path
-  layerName <- polygons_layer_name
+  layerName <- get_layername_from_path(polygons_path)
+  default_projection <- "+proj=longlat +datum=WGS84 +no_defs"
     #polygons_layer_name
   
   
@@ -243,8 +244,6 @@ get_relative_path <- function(state)  # when already under the store folder, inp
 {
     return (paste(state, "/", state, "_Shapefile/", sep=""))
 }
-yes <- 0;
-no <- 0;
 test_state_for_layername <- function(state) # test the state for the listlayer function
 {
     # sapply(abbr, test_state_for_layername)  test all 50 states for this function
@@ -276,9 +275,64 @@ test_state_for_layername <- function(state) # test the state for the listlayer f
       print(paste("success:", state))
     }
 }
-##
-# function for extracting layer names form the path
-get_name_from_path <- function(pathname)
+#################################################
+# get the input shape file given the state name
+#     input:  
+#           state: string, the name of the stae
+#     output:
+#           input_path: string, the path to the polygon shapefile for the given state
+#     description:
+#           check if the state folder exists
+#           check if the shapefile is in lower or uppercase
+get_shape_file <- function(state)
 {
-  
+    state_folder <- paste(project_path, "store", state, sep="/")
+    if ( !file.exists(state_folder) )
+    {
+      print(paste(state, "folder doesn't exist"))
+      return(-1)
+    }
+    shapefile_folder <- paste(state_folder, paste(state,"_Shapefile/", sep=""), sep="/")
+    shapefile <- paste(state, "_final.shp", sep="")
+    input_path <- paste(shapefile_folder, shapefile, sep="")
+    if ( !file.exists(input_path) )
+    {
+      shapefile <- paste(tolower(state), "_final.shp", sep="")
+      input_path <- paste(shapefile_folder, shapefile, sep="")
+    }
+      
+    return(input_path)
+    
+}
+###############################################
+# function for getting the output file for the PointsOverPolygon function
+#     input: 
+#         state: string, the state for the polygon file
+#     output:
+#         output_path: string, the path to the output matching file
+#                     in the format of statename+"_matching.rds" e.g. OH_matching.rds
+
+get_matching_result_path <- function(state)
+{
+    production_folder <- "~/share/projects/VotingBehavior/production/"
+    return(paste(production_folder, state, "_matching.rds", sep=""))
+}
+
+
+##################################################
+# function for extracting layer names form the path
+#   input:
+#       pathname: string, the path to the shapefile 
+#   output:
+#       layer_name: string, the layer name for the given shapfile
+#   description:
+#       This function is for the case where we need to find the layername when 
+#         the input shapefile name is given.
+#
+get_layername_from_path <- function(pathname)
+{
+    vec <- strsplit(pathname, "/")     #split the strings by 
+    file_name <- vec[[1]][lengths(vec)]     # get the shapefile file name
+    layer_name <- gsub(".shp", "", file_name)     # assuming the layer name is the same as the file name
+    return(layer_name)
 }

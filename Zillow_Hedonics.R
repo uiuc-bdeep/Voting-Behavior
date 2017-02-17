@@ -107,10 +107,17 @@ generate_hedonics <- function(state_code, output)
 ##      state_name: string
 ##  output:
 ##      code: number 
-get_code <- function(state_name) {
+get_code <- function(state) {
   
   dict <- as.list(code)
   names(dict) <- abbr
-  return(dict[state_name][[1]])
+  return(dict[state][[1]])
 
+}
+## get the output path for the state given
+get_hedonics_output_path <- function(state)
+{
+    path <- paste(project_path, "production", paste(state, "_Hedonics.rds", sep=""), sep="/")
+    return(path)
+  
 }
