@@ -276,3 +276,9 @@ test_state_for_layername <- function(state) # test the state for the listlayer f
       print(paste("success:", state))
     }
 }
+##
+# function for extracting layer names form the path
+get_name_from_path <- function(pathname)
+{
+  
+}
