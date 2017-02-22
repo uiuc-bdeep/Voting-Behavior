@@ -9,7 +9,7 @@ source("~/share/projects/VotingBehavior/scripts/workflow_module/PointsOverPolygo
 source("~/share/projects/VotingBehavior/scripts/workflow_module/FELM_prep.R")
 
 on_rstudio <- TRUE
-state <- "IL"
+state <- "MO"
 
 abbr <- c("AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL", "GA", "HI",
           "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", 
@@ -36,12 +36,15 @@ output_path <- paste(project_path, "/production/", paste(state, "_generate.rds",
 
 ###################################
 # calling steps
+print(paste("generating", state, "hedonics file"))
 generate_hedonics(state_code, hedonics_output) ## could just use the return value as the input for POP
                                               # save the output to (state)_hedonics.rds
-TD <- points_over_polygon(hedonics_output, polygon_input, points_over_polygon_output)  # save the output to (state)_matching.rds
+print(paste("generating", state, "matching file"))
+points_over_polygon(hedonics_output, polygon_input, points_over_polygon_output)  # save the output to (state)_matching.rds
 
 TD <- felm_prep(points_over_polygon_output)  
 
+print(paste("generating", state, "generate file"))
 saveRDS(TD, output_path) # save the output to (state)_generate.rds
 
 # ###################################

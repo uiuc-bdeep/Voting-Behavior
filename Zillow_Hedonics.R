@@ -15,6 +15,11 @@ generate_hedonics <- function(state_code, output)
   # Change directory to where you've stored ZTRAX
   dir <- paste("DB", state_code, sep="")#"DB17" 
   
+  if (!file.exists(dir))
+  {
+    stop(paste("no folder for DB", toString(state_code),"found"))
+  }
+  
   ## the state code can be find at:
   ## https://en.wikipedia.org/wiki/Federal_Information_Processing_Standard_state_code
   
