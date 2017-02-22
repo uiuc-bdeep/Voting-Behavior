@@ -51,9 +51,20 @@ points_over_polygon <-function(points_path, polygons_path, outputFilePath){
   ## reading state shapefile 
   shpName <- polygonFilePath
   shpDir <- path.expand(shpName)
-  ogrInfo(dsn = shpDir, layer = layerName)
-  shp_poly <- readOGR(shpDir, layerName)
+  ################################################
+  ## store the old working dir, and set the new dir to the shapefile folder
+  wd <- getwd()
+  vec <- strsplit(shpDir, "/")     #split the strings by 
+  shapefile_name <- vec[[1]][lengths(vec)]     # get the shapefile file name
+  temp_wd <- gsub(shapefile_name, "", shpDir)
+  setwd(temp_wd)
   
+  
+  
+  ##################################################
+  ogrInfo(dsn = shpDir, layer = layerName)
+  shp_poly <- readOGR(shapefile_name, layerName)
+  setwd(wd)
   ## adding the indexes in front of precincts 
   shp_poly$addedID <- seq.int(nrow(shp_poly))
   
@@ -228,6 +239,7 @@ points_over_polygon_fieldNameForPoints <-function(points_path, polygons_path, po
   
   final_res <- cbind(points_res, res)
   
+  print("writing matching outputs to a rds file")
   saveRDS(final_res, outputFilePath)
   
   return(final_res)
@@ -293,6 +305,10 @@ get_shape_file <- function(state)
       return(-1)
     }
     shapefile_folder <- paste(state_folder, paste(state,"_Shapefile/", sep=""), sep="/")
+    if ( !file.exists(shapefile_folder) )
+    {
+      shapefile_folder <- paste(state_folder, paste(tolower(state),"_Shapefile/", sep=""), sep="/")
+    }
     shapefile <- paste(state, "_final.shp", sep="")
     input_path <- paste(shapefile_folder, shapefile, sep="")
     if ( !file.exists(input_path) )
